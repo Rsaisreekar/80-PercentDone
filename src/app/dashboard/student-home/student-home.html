@@ -1,0 +1,94 @@
+<!-- <h2>Available Exams</h2>
+<div *ngFor="let exam of exams" class="exam-card">
+  <mat-card>
+    <mat-card-title>{{ exam.title }}</mat-card-title>
+    <mat-card-content>
+      <p>{{ exam.description }}</p>
+      <p><strong>Duration:</strong> {{ exam.duration }} minutes</p>
+      <p><strong>Total Marks:</strong> {{ exam.totalMarks }}</p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" (click)="startExam(exam.examId)">Attempt Exam</button>
+    </mat-card-actions>
+  </mat-card>
+</div>
+
+<div style="margin-top: 30px;">
+  <button mat-stroked-button color="accent" (click)="viewResults()">View My Results</button>
+  <button mat-stroked-button color="warn" (click)="updateProfile()">Update Profile</button>
+</div> -->
+
+
+<!-- <mat-toolbar color="primary" class="toolbar">
+  <span class="title">Online Exam Portal</span>
+  <span class="spacer"></span>
+  <a mat-button routerLink="/student-home">Home</a>
+  <a mat-button routerLink="/student-home">Exams</a>
+  <a mat-button routerLink="/results">Results</a>
+
+  <button mat-icon-button [matMenuTriggerFor]="profileMenu">
+    <img src="https://i.pravatar.cc/30" alt="User" class="avatar" />
+  </button>
+</mat-toolbar>
+
+<mat-menu #profileMenu="matMenu">
+  <button mat-menu-item disabled>Name: Sai Sreekar</button>
+  <button mat-menu-item disabled>Email: sai&#64;example.com</button>
+  <button mat-menu-item (click)="updateProfile()">Update Profile</button>
+  <button mat-menu-item color="warn" (click)="logout()">Logout</button>
+</mat-menu>
+
+<div class="content">
+  <h2>Available Exams</h2>
+  <div *ngFor="let exam of exams" class="exam-card">
+    <mat-card>
+      <mat-card-title>{{ exam.title }}</mat-card-title>
+      <mat-card-content>
+        <p>{{ exam.description }}</p>
+        <p><strong>Duration:</strong> {{ exam.duration }} minutes</p>
+        <p><strong>Total Marks:</strong> {{ exam.totalMarks }}</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="startExam(exam.examId)">Attempt Exam</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>
+
+<mat-toolbar color="primary" class="footer">
+  <span>© 2025 Online Exam Portal | All rights reserved.</span>
+</mat-toolbar> -->
+
+
+<mat-toolbar color="primary" class="toolbar">
+  <span class="title">Online Exam Portal</span>
+  <span class="spacer"></span>
+  <a mat-button routerLink="/student-home">Home</a>
+  <a mat-button routerLink="/exams">Exams</a>
+  <a mat-button routerLink="/results">Results</a>
+
+  <button mat-icon-button [matMenuTriggerFor]="profileMenu">
+    <img src="https://i.pravatar.cc/30" alt="User" class="avatar" />
+  </button>
+</mat-toolbar>
+
+<mat-menu #profileMenu="matMenu">
+  <button mat-menu-item disabled>Name: Sai Sreekar</button>
+  <button mat-menu-item disabled>Email: sai#64;example.com</button>
+  <button mat-menu-item (click)="openUpdateProfileDialog()">Update Profile</button>
+  <button mat-menu-item (click)="logout()">Logout</button>
+</mat-menu>
+
+<div class="welcome-container">
+  <h1>Welcome, Sai Sreekar!</h1>
+  <p>Ready to test your knowledge?</p>
+
+  <div class="button-group">
+    <button mat-raised-button color="primary" routerLink="/exams">📝 Go to Exams</button>
+    <button mat-raised-button color="accent" routerLink="/results">📊 View Results</button>
+  </div>
+</div>
+
+<mat-toolbar color="primary" class="footer">
+  <span>&#64; 2025 Online Exam Portal | All rights reserved.</span>
+</mat-toolbar>

@@ -1,0 +1,22 @@
+<mat-toolbar color="primary">
+  <span>Exam Attempt</span>
+  <span class="spacer"></span>
+  <span>Time Left: {{ formatTime() }}</span>
+</mat-toolbar>
+
+<div class="exam-container">
+  <div *ngFor="let q of questions" class="question-card">
+    <mat-card>
+      <mat-card-title>Q{{ q.id }}. {{ q.text }}</mat-card-title>
+      <mat-card-content>
+        <mat-radio-group [(ngModel)]="answers[q.id]">
+          <mat-radio-button *ngFor="let opt of q.options" [value]="opt">
+            {{ opt }}
+          </mat-radio-button>
+        </mat-radio-group>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <button mat-raised-button color="primary" (click)="submitExam()">Submit Exam</button>
+</div>
