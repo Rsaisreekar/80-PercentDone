@@ -36,6 +36,10 @@ export const appRoutes: Routes = [
   { path: 'exams', component: ExamsComponent },
   { path: 'exam/:id', component: ExamAttemptComponent },
   { path: 'results', component: ResultsComponent },
+  {
+  path: 'results/:examId',
+  component: ResultsComponent
+},
   {path:'admin/manage-questions',component:ManageQuestionsComponent},
 
 

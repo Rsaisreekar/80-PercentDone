@@ -24,6 +24,9 @@
 
       <button mat-raised-button color="primary" type="submit">Register</button>
     </form>
+    <div *ngIf="errorMessage" class="error">
+  {{ errorMessage }}
+</div>
     <p>Already have an account? <a routerLink="/login">Login here</a></p>
   </mat-card>
 </div>

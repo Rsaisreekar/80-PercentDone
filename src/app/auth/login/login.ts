@@ -38,17 +38,32 @@ export class LoginComponent {
     });
   }
 
+  // onSubmit() {
+  //   if (this.loginForm.valid) {
+  //     this.auth.login(this.loginForm.value).subscribe({
+  //       next: (res) => {
+  //         this.auth.storeToken(res.token);
+  //         const role = this.auth.decodeRoleFromToken();
+  //         if (role === 'ADMIN') this.router.navigate(['/admin-home']);
+  //         else if (role === 'STUDENT') this.router.navigate(['/student-home']);
+  //       },
+  //       error: () => alert('Invalid Credentials')
+  //     });
+  //   }
+  // }
   onSubmit() {
-    if (this.loginForm.valid) {
-      this.auth.login(this.loginForm.value).subscribe({
-        next: (res) => {
-          this.auth.storeToken(res.token);
-          const role = this.auth.decodeRoleFromToken();
-          if (role === 'ADMIN') this.router.navigate(['/admin-home']);
-          else if (role === 'STUDENT') this.router.navigate(['/student-home']);
-        },
-        error: () => alert('Invalid Credentials')
-      });
-    }
-  }
+  if (this.loginForm.invalid) return;
+
+  this.auth.login(this.loginForm.value).subscribe({
+    next: res => {
+      if (res.role === 'ADMIN') {
+        this.router.navigate(['/admin']);
+      } else {
+        this.router.navigate(['/student']);
+      }
+    },
+    error: () => alert('Invalid Credentials')
+  });
+}
+
 }
