@@ -133,7 +133,7 @@ export interface JwtPayload {
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:8080/examProtal/userModule';
+  private baseUrl = 'http://localhost:8081/examProtal/userModule';
 
   constructor(private http: HttpClient, private router: Router) {}
 

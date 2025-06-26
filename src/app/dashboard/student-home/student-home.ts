@@ -182,14 +182,19 @@ export class StudentHomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const userId = this.authService.getLoggedInUserId();
-    if (userId) {
-      this.userService.getUserProfile(userId).subscribe({
-        next: profile => this.user = profile,
-        error: err => console.error('Failed to fetch user profile', err)
-      });
-    }
+  const userId = localStorage.getItem('userId');
+  if (userId) {
+    this.authService.getProfile().subscribe(
+      (userData) => {
+        this.user = userData;
+      },
+      (error) => {
+        console.error('Failed to fetch user details:', error);
+      }
+    );
   }
+}
+
 
   startExam(examId: number): void {
     this.router.navigate(['/exam', examId]);

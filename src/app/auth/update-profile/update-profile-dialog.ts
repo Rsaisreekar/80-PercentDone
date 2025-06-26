@@ -2,18 +2,18 @@
 // import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 // import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 // import { CommonModule } from '@angular/common';
-// import { FormsModule } from '@angular/forms';
 // import { MatFormFieldModule } from '@angular/material/form-field';
 // import { MatInputModule } from '@angular/material/input';
 // import { MatButtonModule } from '@angular/material/button';
 // import { AuthService } from '../../services/auth';
+// import { UserService } from '../../services/user-service';
 
 // @Component({
 //   selector: 'app-update-profile-dialog',
 //   standalone: true,
 //   imports: [
 //     CommonModule,
-//     FormsModule,
+//     ReactiveFormsModule,
 //     MatFormFieldModule,
 //     MatInputModule,
 //     MatButtonModule
@@ -22,57 +22,72 @@
 //   styleUrls: ['./update-profile-dialog.css']
 // })
 // export class UpdateProfileDialogComponent {
-//   user = {
-//     name: '',
-//     email: '',
-//     password: '',
-//     confirmPassword: ''
-//   };
+//   profileForm: FormGroup;
 
 //   constructor(
 //     public dialogRef: MatDialogRef<UpdateProfileDialogComponent>,
 //     @Inject(MAT_DIALOG_DATA) public data: any,
-//     private authService:AuthService
+//     private fb: FormBuilder,
+//     private authService: AuthService,
+//     private userService:UserService
 //   ) {
-//     this.user.name = data.name;
-//     this.user.email = data.email;
+//     this.profileForm = this.fb.group({
+//       name: [data.name, Validators.required],
+//       email: [data.email, [Validators.required, Validators.email]],
+//       password: [''],
+//       confirmPassword: ['']
+//     });
 //   }
 
-//   saveChanges() {
-//     if (this.user.password !== this.user.confirmPassword) {
-//       alert('Passwords do not match');
+//   ngOnInit(): void {
+//   const userId = localStorage.getItem('userId');
+//   if (userId) {
+//     this.authService.getProfile().subscribe(
+//       (data) => {
+//         this.userForm.patchValue(data);
+//       },
+//       (error) => {
+//         console.error('Error loading user:', error);
+//       }
+//     );
+//   }
+// }
+
+
+//   onSave() {
+//     if (
+//       this.profileForm.value.password &&
+//       this.profileForm.value.password !== this.profileForm.value.confirmPassword
+//     ) {
+//       alert('Passwords do not match!');
 //       return;
 //     }
 
-//     console.log('Updated user:', this.user);
-//     this.dialogRef.close(this.user); // return updated data
+//     this.authService.updateProfile(this.profileForm.value).subscribe({
+//       next: () => {
+//         this.dialogRef.close(true);
+//       },
+//       error: err => {
+//         alert('Failed to update profile: ' + err.error.message);
+//       }
+//     });
 //   }
-
-//   onSave() {
-//   this.authService.updateProfile(this.profileForm.value).subscribe({
-//     next: () => {
-//       this.dialogRef.close(true);
-//     },
-//     error: err => {
-//       alert('Failed to update profile: ' + err.error.message);
-//     }
-//   });
-// }
-
 
 //   cancel() {
 //     this.dialogRef.close();
 //   }
 // }
 
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { UserService } from '../../services/user-service';
 import { AuthService } from '../../services/auth';
+
 
 @Component({
   selector: 'app-update-profile-dialog',
@@ -87,21 +102,39 @@ import { AuthService } from '../../services/auth';
   templateUrl: './update-profile-dialog.html',
   styleUrls: ['./update-profile-dialog.css']
 })
-export class UpdateProfileDialogComponent {
+export class UpdateProfileDialogComponent implements OnInit {
   profileForm: FormGroup;
 
   constructor(
     public dialogRef: MatDialogRef<UpdateProfileDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
+    private userService: UserService,
     private authService: AuthService
   ) {
     this.profileForm = this.fb.group({
-      name: [data.name, Validators.required],
-      email: [data.email, [Validators.required, Validators.email]],
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
       password: [''],
       confirmPassword: ['']
     });
+  }
+
+  ngOnInit(): void {
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      this.authService.getProfile().subscribe({
+        next: (user) => {
+          this.profileForm.patchValue({
+            name: user.name,
+            email: user.email
+          });
+        },
+        error: (err) => {
+          console.error('Error fetching user:', err);
+        }
+      });
+    }
   }
 
   onSave() {
@@ -113,8 +146,22 @@ export class UpdateProfileDialogComponent {
       return;
     }
 
-    this.authService.updateProfile(this.profileForm.value).subscribe({
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      alert('User ID not found');
+      return;
+    }
+
+    const updatedData = {
+      userId: +userId,
+      name: this.profileForm.value.name,
+      email: this.profileForm.value.email,
+      password: this.profileForm.value.password || undefined
+    };
+
+    this.userService.updateUser(updatedData).subscribe({
       next: () => {
+        alert('Profile updated successfully!');
         this.dialogRef.close(true);
       },
       error: err => {

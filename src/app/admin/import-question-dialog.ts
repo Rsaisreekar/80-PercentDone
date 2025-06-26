@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
+import { Question } from '../models/question.model';
+
 
 @Component({
   selector: 'app-import-question-dialog',
@@ -14,17 +16,16 @@ import { MatButtonModule } from '@angular/material/button';
 })
 export class ImportQuestionDialogComponent {
   selectedQuestions: number[] = [];
-  questionBank = [
-    { questionId: 1, text: 'What is 2 + 2?' },
-    { questionId: 2, text: 'Capital of Japan?' },
-    { questionId: 3, text: 'What is H2O?' },
-    { questionId: 4, text: 'Who wrote Hamlet?' }
-  ];
+  questionBank: Question[] = [];
+  mappedIds: number[] = [];
 
   constructor(
     private dialogRef: MatDialogRef<ImportQuestionDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public examId: number
-  ) {}
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {
+    this.questionBank = data.questionBank;
+    this.mappedIds = data.mappedQuestionIds;
+  }
 
   toggleSelection(id: number) {
     const index = this.selectedQuestions.indexOf(id);
@@ -33,6 +34,10 @@ export class ImportQuestionDialogComponent {
     } else {
       this.selectedQuestions.push(id);
     }
+  }
+
+  isMapped(id: number): boolean {
+    return this.mappedIds.includes(id);
   }
 
   importSelected() {

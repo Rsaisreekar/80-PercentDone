@@ -21,13 +21,17 @@ import { MatButtonModule } from '@angular/material/button';
 })
 export class ExamDialogComponent {
   examForm: FormGroup;
+  isEditMode: boolean = false;
 
   constructor(
     private dialogRef: MatDialogRef<ExamDialogComponent>,
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public data: any // can be null or existing exam
   ) {
+    this.isEditMode = !!data?.examId;
+
     this.examForm = this.fb.group({
+      examId: [data?.examId || null],
       title: [data?.title || '', Validators.required],
       description: [data?.description || '', Validators.required],
       duration: [data?.duration || 30, [Validators.required, Validators.min(1)]],

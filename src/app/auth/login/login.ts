@@ -57,9 +57,9 @@ export class LoginComponent {
   this.auth.login(this.loginForm.value).subscribe({
     next: res => {
       if (res.role === 'ADMIN') {
-        this.router.navigate(['/admin']);
+        this.router.navigate(['/admin-home']);
       } else {
-        this.router.navigate(['/student']);
+        this.router.navigate(['/student-home']);
       }
     },
     error: () => alert('Invalid Credentials')

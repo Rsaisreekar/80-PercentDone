@@ -40,7 +40,10 @@ export const appRoutes: Routes = [
   path: 'results/:examId',
   component: ResultsComponent
 },
-  {path:'admin/manage-questions',component:ManageQuestionsComponent},
+  {
+  path: 'admin/questions/:examId',
+  component: ManageQuestionsComponent
+},
 
 
   //{ path: 'exam/:examId', component: AttemptExamComponent },     // To be created

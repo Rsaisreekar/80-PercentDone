@@ -1,136 +1,131 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { MatToolbar } from '@angular/material/toolbar';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { ImportQuestionDialogComponent } from '../admin/import-question-dialog';
-import { RouterModule } from '@angular/router';
+import { MatCard } from '@angular/material/card';
+import { MatCardTitle } from '@angular/material/card';
+import { MatCardContent } from '@angular/material/card';
+import { MatCardActions } from '@angular/material/card';
+import { QuestionService } from '../services/question/question-service';
 import { Question } from '../models/question.model';
 import { AddEditQuestionDialogComponent } from './add-edit-question-dialog';
+import { ImportQuestionDialogComponent } from './import-question-dialog';
 
 @Component({
   selector: 'app-manage-questions',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatDialogModule,
-    MatToolbar,
-    RouterModule
-  ],
+  imports: [MatToolbar,MatCard,MatCardContent,MatCardTitle,MatCardActions],
   templateUrl: './manage-questions.html',
   styleUrls: ['./manage-questions.css']
 })
-export class ManageQuestionsComponent {
-  // This is your complete bank of available questions
-  questionBank: Question[] = [
-    {
-      questionId: 1,
-      text: 'What is 2 + 2?',
-      category: 'Math',
-      difficulty: 'Easy',
-      correctAnswer: '4',
-      options: ['2', '3', '4', '5']
-    },
-    {
-      questionId: 2,
-      text: 'Capital of Japan?',
-      category: 'Geography',
-      difficulty: 'Medium',
-      correctAnswer: 'Tokyo',
-      options: ['Seoul', 'Tokyo', 'Beijing', 'Bangkok']
-    },
-    {
-      questionId: 3,
-      text: 'What is H2O?',
-      category: 'Science',
-      difficulty: 'Easy',
-      correctAnswer: 'Water',
-      options: ['Oxygen', 'Hydrogen', 'Salt', 'Water']
-    },
-    {
-      questionId: 4,
-      text: 'Who wrote Hamlet?',
-      category: 'Literature',
-      difficulty: 'Hard',
-      correctAnswer: 'Shakespeare',
-      options: ['Milton', 'Shakespeare', 'Keats', 'Wordsworth']
+export class ManageQuestionsComponent implements OnInit {
+  examId!: number;
+  questionBank: Question[] = [];
+  mappedQuestionIds: number[] = [];
+
+  constructor(
+    private route: ActivatedRoute,
+    private questionService: QuestionService,
+    private dialog: MatDialog
+  ) {}
+
+  ngOnInit(): void {
+    this.examId = Number(this.route.snapshot.paramMap.get('examId'));
+    if (!this.examId) {
+      alert('Invalid exam ID');
+      return;
     }
-  ];
 
-  // This holds the selected questions per exam
-  examQuestionMap: { [examId: number]: number[] } = {};
-
-  selectedExamId = 101; // You can make this dynamic later
-
-  constructor(private dialog: MatDialog) {}
-
-  // This dynamically filters the question list to only those selected for this exam
-  get questions(): Question[] {
-    const mappedIds = this.examQuestionMap[this.selectedExamId] || [];
-    return this.questionBank.filter(q => mappedIds.includes(q.questionId));
+    this.loadAllQuestions();
+    this.loadMappedQuestions();
   }
 
-  // Import selected questions from the dialog
+  get questions(): Question[] {
+    return this.questionBank.filter(q => this.mappedQuestionIds.includes(q.questionId));
+  }
+
+  loadAllQuestions() {
+    this.questionService.getAllQuestions().subscribe({
+      next: data => this.questionBank = data,
+      error: err => alert('Failed to load questions: ' + err.error.message)
+    });
+  }
+
+  loadMappedQuestions() {
+    this.questionService.getMappedQuestions(this.examId).subscribe({
+      next: data => this.mappedQuestionIds = data.map(q => q.questionId),
+      error: err => alert('Failed to load mapped questions: ' + err.error.message)
+    });
+  }
+
   importQuestions() {
     const dialogRef = this.dialog.open(ImportQuestionDialogComponent, {
       width: '500px',
-      data: this.selectedExamId
+      data: { examId: this.examId, questionBank: this.questionBank }
     });
 
     dialogRef.afterClosed().subscribe((selectedIds: number[]) => {
-      if (selectedIds && selectedIds.length > 0) {
-        this.examQuestionMap[this.selectedExamId] = selectedIds;
+      if (selectedIds?.length) {
+        this.questionService.mapQuestions(this.examId, selectedIds).subscribe({
+          next: () => this.loadMappedQuestions(),
+          error: err => alert('Mapping failed: ' + err.error.message)
+        });
       }
     });
   }
 
   addQuestion() {
-  const dialogRef = this.dialog.open(AddEditQuestionDialogComponent, {
-    width: '600px',
-    data: {} // empty data for new question
-  });
+    const dialogRef = this.dialog.open(AddEditQuestionDialogComponent, {
+      width: '600px',
+      data: {}
+    });
 
-  dialogRef.afterClosed().subscribe((newQuestion: Question) => {
-    if (newQuestion) {
-      // Generate a new questionId
-      newQuestion.questionId = Math.max(...this.questionBank.map(q => q.questionId)) + 1;
-
-      this.questionBank.push(newQuestion);
-
-      // Add to current exam mapping
-      if (!this.examQuestionMap[this.selectedExamId]) {
-        this.examQuestionMap[this.selectedExamId] = [];
+    dialogRef.afterClosed().subscribe((newQuestion: Question) => {
+      if (newQuestion) {
+        this.questionService.addQuestion(newQuestion).subscribe({
+          next: () => {
+            this.loadAllQuestions();
+            setTimeout(() => this.mapSingleQuestion(newQuestion.questionId), 500);
+          },
+          error: err => alert('Failed to add question: ' + err.error.message)
+        });
       }
-      this.examQuestionMap[this.selectedExamId].push(newQuestion.questionId);
-    }
-  });
-}
+    });
+  }
+
   editQuestion(id: number) {
-  const questionToEdit = this.questionBank.find(q => q.questionId === id);
-  const dialogRef = this.dialog.open(AddEditQuestionDialogComponent, {
-    width: '600px',
-    data: { question: questionToEdit }
-  });
+    const question = this.questionBank.find(q => q.questionId === id);
+    const dialogRef = this.dialog.open(AddEditQuestionDialogComponent, {
+      width: '600px',
+      data: { question }
+    });
 
-  dialogRef.afterClosed().subscribe((updated: Question) => {
-    if (updated) {
-      const index = this.questionBank.findIndex(q => q.questionId === updated.questionId);
-      if (index !== -1) {
-        this.questionBank[index] = updated;
+    dialogRef.afterClosed().subscribe((updated: Question) => {
+      if (updated) {
+        this.questionService.updateQuestion(updated.questionId!, updated).subscribe({
+          next: () => this.loadAllQuestions(),
+          error: err => alert('Failed to update question: ' + err.error.message)
+        });
       }
-    }
-  });
-}
+    });
+  }
 
   deleteQuestion(id: number) {
     if (confirm('Are you sure you want to delete this question?')) {
-      const updatedIds = (this.examQuestionMap[this.selectedExamId] || []).filter(qId => qId !== id);
-      this.examQuestionMap[this.selectedExamId] = updatedIds;
+      this.questionService.deleteQuestion(id).subscribe({
+        next: () => {
+          this.loadAllQuestions();
+          this.mappedQuestionIds = this.mappedQuestionIds.filter(qid => qid !== id);
+        },
+        error: err => alert('Failed to delete question: ' + err.error.message)
+      });
     }
+  }
+
+  private mapSingleQuestion(questionId: number) {
+    this.questionService.mapQuestionToExam(this.examId, questionId).subscribe({
+      next: () => this.loadMappedQuestions(),
+      error: err => console.error('Failed to map question:', err)
+    });
   }
 }
