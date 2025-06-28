@@ -32,8 +32,8 @@ export class UserService {
   }
  updateUser(userData: any): Observable<any> {
   const token = localStorage.getItem('token');
-  const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-  return this.http.put(`${this.baseUrl}/user/${userData.userId}`, userData, { headers });
+  //const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  return this.http.put(`${this.baseUrl}/update/${userData.userId}`, userData);
 }
 
 }

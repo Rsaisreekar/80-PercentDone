@@ -19,8 +19,8 @@ export const appRoutes: Routes = [
   {
     path: 'admin-home',
     component: AdminHomeComponent,
-    // canActivate: [AuthGuard],
-    // data: { role: 'ADMIN' }
+    canActivate: [AuthGuard],
+    data: { role: 'ADMIN' }
   },
  {
     path:'admin/manage-exams',
@@ -29,8 +29,8 @@ export const appRoutes: Routes = [
   {
     path: 'student-home',
     component: StudentHomeComponent,
-    // canActivate: [AuthGuard],
-    // data: { role: 'STUDENT' }
+    canActivate: [AuthGuard],
+    data: { role: 'STUDENT' }
   },
   {path:'manage-users',component:ManageUsersComponent},
   { path: 'exams', component: ExamsComponent },

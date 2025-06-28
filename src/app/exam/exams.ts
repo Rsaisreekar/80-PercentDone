@@ -39,6 +39,7 @@ export class ExamsComponent implements OnInit {
   }
 
   startExam(examId: number): void {
+    localStorage.setItem('examId', examId.toString());
     this.router.navigate(['/exam', examId]);
   }
 

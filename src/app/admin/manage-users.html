@@ -29,8 +29,7 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>Action</th>
         <td mat-cell *matCellDef="let user">
-          <button mat-raised-button color="primary" (click)="updateRole(user.userId, user.role)">
-            Save
+          <button mat-raised-button color="primary" (click)="updateRole(user.userId, user.role)">Update
           </button>
         </td>
       </ng-container>

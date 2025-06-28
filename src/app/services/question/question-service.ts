@@ -53,7 +53,7 @@ export class QuestionService {
   }
 
   updateQuestion(id: number, question: Question): Observable<Question> {
-    return this.http.put<Question>(`${this.baseUrl2}/updQuestion/${id}`, question);
+    return this.http.put<Question>(`${this.baseUrl2}/updateQuestion/${id}`, question);
   }
 
   deleteQuestion(id: number): Observable<void> {

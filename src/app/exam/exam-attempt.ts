@@ -98,7 +98,7 @@ export class ExamAttemptComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.examId = +this.route.snapshot.paramMap.get('examId')!;
+    this.examId = +parseInt(localStorage.getItem('examId')||'0');   
     this.userId = +localStorage.getItem('userId')!;
     this.loadQuestions();
     this.startTimer();
@@ -106,8 +106,10 @@ export class ExamAttemptComponent implements OnInit {
 
   loadQuestions() {
     this.examService.getQuestionsByExamId(this.examId).subscribe({
-      next: (data) => {
-        this.questions = data;
+      next: (data:any) => {
+        console.log('Raw questions:', data);
+
+        this.questions = data.questions;
         this.isLoading = false;
       },
       error: (err) => {

@@ -36,6 +36,8 @@ export interface ExamSubmissionDTO {
 })
 export class ExamService {
   private baseUrl = 'http://localhost:8082/api/admin/exams'; // update port if needed
+  private baseUrl2 = 'http://localhost:8084/api/exam-management';
+
 
   constructor(private http: HttpClient) {}
 
@@ -44,9 +46,9 @@ export class ExamService {
   }
 
   getQuestionsByExamId(examId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/mapped-questions/${examId}`);
+    return this.http.get<any[]>(`${this.baseUrl2}/${examId}/attempt`);
   }
-
+  
   submitExam(examId: number, submission: ExamSubmissionDTO): Observable<any> {
     return this.http.post(`${this.baseUrl}/submit/${examId}`, submission);
   }

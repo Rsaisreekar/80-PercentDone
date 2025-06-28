@@ -148,6 +148,7 @@
 // student-home.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -169,6 +170,7 @@ import { UpdateProfileDialogComponent } from '../../auth/update-profile/update-p
     MatIconModule,
     MatCardModule,
     MatButtonModule,
+    RouterModule
     ]
 })
 export class StudentHomeComponent implements OnInit {
@@ -197,7 +199,7 @@ export class StudentHomeComponent implements OnInit {
 
 
   startExam(examId: number): void {
-    this.router.navigate(['/exam', examId]);
+    this.router.navigate(['/exams']);
   }
 
   viewResults(): void {
