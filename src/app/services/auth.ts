@@ -133,7 +133,7 @@ export interface JwtPayload {
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:8081/examProtal/userModule';
+  private baseUrl = 'http://localhost:8090/examPortal/userModule';
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -180,7 +180,7 @@ export class AuthService {
 
   getLoggedInUserId(): number | null {
     const decoded = this.decodeToken();
-    return decoded ? +decoded.sub : null; // assuming 'sub' is the userId or email
+    return decoded ? +decoded.sub : null; // assuming 'sub' is userId or email
   }
 
   getLoggedInEmail(): string | null {
@@ -196,22 +196,6 @@ export class AuthService {
     return localStorage.getItem('role') || '';
   }
 
-//   decodeRoleFromToken(): string | null {
-//   const token = this.getToken();
-//   if (!token) return null;
-
-//   try {
-//     const decoded: JwtPayload = jwtDecode(token);
-//     const roles = decoded.roles;
-//     if (roles && roles.length > 0) {
-//       return roles[0].replace('ROLE_', '');
-//     }
-//     return null;
-//   } catch (error) {
-//     console.error('Failed to decode JWT:', error);
-//     return null;
-//   }
-// }
   decodeRoleFromToken(): string {
     const token = this.getToken();
     if (!token) return '';

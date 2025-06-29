@@ -20,11 +20,14 @@ export interface Question {
   category: string;
   difficulty: string;
   correctAnswer: string;
-  options: string[];
+  option1: string;              // ✅ Add these
+  option2: string;              // ✅ Add these
+  options?: string[];           // optional array for frontend display
 }
 
+
 export interface Mapping {
-  id: number;
+  mappingId: number;
   examId: number;
   questionId: number;
 }
@@ -33,8 +36,8 @@ export interface Mapping {
   providedIn: 'root'
 })
 export class QuestionService {
-  private readonly baseUrl = 'http://localhost:8084/api/exam-management/mappings';
-  private readonly baseUrl2 = 'http://localhost:8083/api/questionbank';
+  private readonly baseUrl = 'http://localhost:8090/api/exam-management/mappings';
+  private readonly baseUrl2 = 'http://localhost:8090/api/questionbank';
 
   constructor(private http: HttpClient) {}
 
@@ -48,17 +51,31 @@ export class QuestionService {
     return this.http.get<Question>(`${this.baseUrl2}/questionById/${id}`);
   }
 
-  addQuestion(question: Question): Observable<Question> {
-    return this.http.post<Question>(`${this.baseUrl2}/addQuestion`, question);
+  addQuestion(question: Question[]): Observable<Question[]> {
+    return this.http.post<Question[]>(`${this.baseUrl2}/addQuestion`, [question]);
   }
 
   updateQuestion(id: number, question: Question): Observable<Question> {
-    return this.http.put<Question>(`${this.baseUrl2}/updateQuestion/${id}`, question);
-  }
+  return this.http.put<Question>(`${this.baseUrl2}/updQuestion/${id}`, question);
+}
+
+getQuestionsByCategory(category: string): Observable<Question[]> {
+  return this.http.get<Question[]>(`${this.baseUrl2}/getByCategory/${category}`);
+}
+
+getQuestionsByDifficulty(difficulty: string): Observable<Question[]> {
+  return this.http.get<Question[]>(`${this.baseUrl2}/getByDifficulty/${difficulty}`);
+}
+
+
 
   deleteQuestion(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl2}/delQuestion/${id}`);
   }
+
+  uploadCSV(file: FormData): Observable<any> {
+  return this.http.post(`${this.baseUrl2}/uploadFile`, file);
+}
 
   /** Mapping Operations **/
 
@@ -73,8 +90,8 @@ export class QuestionService {
   }
 
   // Delete a specific mapping by its ID
-  deleteMapping(mappingId: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${mappingId}`);
+  deleteMapping(mappingId: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/${mappingId}`);
   }
 
   // Unmap all questions from a given exam

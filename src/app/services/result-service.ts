@@ -1,40 +1,23 @@
-// import { Injectable } from '@angular/core';
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class ResultService {
-
-//   constructor() { }
-// }
-
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-export interface ReportSummary {
-  reportId: number;
-  userId: number;
-  examId: number;
-  totalMarks: number;
-  performanceMetrics: string;
+export interface ResponseSummary {
+  responseId: number;
+  questionId: number;
+  submittedAnswer: string;
+  marksObtained: number;
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class ResultService {
-  private baseUrl = 'http://localhost:8080/analytics/reports';
+  private readonly baseUrl = 'http://localhost:8090/api/exam-management';
 
   constructor(private http: HttpClient) {}
 
-  getUserReport(userId: number, examId: number): Observable<ReportSummary> {
-    return this.http.get<ReportSummary>(`${this.baseUrl}/user/${userId}/exam/${examId}`);
-  }
-
-  getRank(userId: number): Observable<number> {
-    return this.http.get<number>(`${this.baseUrl}/rank?userId=${userId}`);
-  }
-
-  getTopper(): Observable<ReportSummary> {
-    return this.http.get<ReportSummary>(`${this.baseUrl}/topper`);
+  getResult(examId: number, userId: number): Observable<ResponseSummary[]> {
+    return this.http.get<ResponseSummary[]>(`${this.baseUrl}/${examId}/responses/user/${userId}`);
   }
 }

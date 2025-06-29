@@ -61,8 +61,7 @@ export class LoginComponent {
       } else {
         this.router.navigate(['/student-home']);
       }
-    },
-    error: () => alert('Invalid Credentials')
+    }
   });
 }
 

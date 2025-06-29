@@ -48,19 +48,6 @@ export class RegisterComponent {
     });
   }
 
-  // onSubmit() {
-  //   const { password, confirmPassword } = this.registerForm.value;
-
-  //   if (this.registerForm.valid && password === confirmPassword) {
-  //     this.auth.register(this.registerForm.value).subscribe({
-  //       next: () => alert('Registration successful'),
-  //       error: () => alert('Registration failed')
-  //     });
-  //   } else {
-  //     alert('Password and Confirm Password must match');
-  //   }
-  // }
-
   onSubmit() {
   if (this.registerForm.invalid) return;
 
@@ -68,9 +55,6 @@ export class RegisterComponent {
     next: () => {
       alert('Registered Successfully!');
       this.router.navigate(['/login']);
-    },
-    error: err => {
-      this.errorMessage = 'Registration failed: ' + err.error.message;
     }
   });
 }

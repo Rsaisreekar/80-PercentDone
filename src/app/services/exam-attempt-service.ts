@@ -1,13 +1,3 @@
-// import { Injectable } from '@angular/core';
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class ExamAttemptService {
-
-//   constructor() { }
-// }
-
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -32,8 +22,8 @@ export interface ExamSubmission {
 }
 
 @Injectable({ providedIn: 'root' })
-export class ExamService {
-  private baseUrl = 'http://localhost:8080/api/questionbank';
+export class ExamServiceAttempt {
+  private baseUrl = 'http://localhost:8090/api/questionbank';
 
   constructor(private http: HttpClient) {}
 
@@ -41,7 +31,8 @@ export class ExamService {
     return this.http.get<Question[]>(`${this.baseUrl}/attemptQuestions`);
   }
 
-  submitExam(submission: ExamSubmission): Observable<any> {
-    return this.http.post(`http://localhost:8080/api/exam/submit`, submission);
-  }
+  // submitExam(submission: ExamSubmission): Observable<any> {
+  //   return this.http.post(`http://localhost:8090/api/exam-management/${examId}/submit`, submissionDTO);
+
+  // }
 }

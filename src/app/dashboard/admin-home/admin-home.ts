@@ -43,7 +43,7 @@ export class AdminHomeComponent {
   }
 
   goToManageQuestions() {
-    this.router.navigate(['admin/manage-exams']);
+    this.router.navigate(['question-bank']);
   }
 
   goToReports() {

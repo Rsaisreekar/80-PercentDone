@@ -37,3 +37,22 @@
   padding: 10px;
   text-align: center;
 }
+.content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.exam-card {
+  margin-bottom: 20px;
+}
+
+.attempted {
+  color: red;
+  font-weight: bold;
+}
+
+.not-attempted {
+  color: green;
+  font-weight: bold;
+}

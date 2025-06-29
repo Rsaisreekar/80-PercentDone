@@ -23,7 +23,7 @@ export interface UserProfile {
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private baseUrl = 'http://localhost:8081/examProtal/userModule'; // adjust as needed
+  private baseUrl = 'http://localhost:8090/examPortal/userModule'; // adjust as needed
 
   constructor(private http: HttpClient) {}
 
@@ -32,8 +32,8 @@ export class UserService {
   }
  updateUser(userData: any): Observable<any> {
   const token = localStorage.getItem('token');
-  //const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-  return this.http.put(`${this.baseUrl}/update/${userData.userId}`, userData);
+  const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  return this.http.put(`${this.baseUrl}/${userData.userId}`, userData,{ headers });
 }
 
 }

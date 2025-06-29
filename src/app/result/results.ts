@@ -1,122 +1,168 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
-import { ResultService } from '../services/result-service';
+// import { Component, OnInit } from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import { ResultService, ResponseSummary } from '../services/result-service';
+// import { ActivatedRoute } from '@angular/router';
+ import { MatCard } from '@angular/material/card';
+ import { MatCardContent } from '@angular/material/card';
+ import { MatCardTitle } from '@angular/material/card';
+ import { MatToolbar } from '@angular/material/toolbar';
+ import { UserHeaderComponent } from '../shared-components/user-header/user-header';
+ import { FooterComponent } from '../shared-components/footer/footer';
 
 // @Component({
 //   selector: 'app-results',
 //   standalone: true,
-//   imports: [
-//     CommonModule,
-//     RouterModule,
-//     MatCardModule,
-//     MatToolbarModule,
-//     MatButtonModule,
-//     MatMenuModule,
-//     MatIconModule,
-//     MatTableModule
-//   ],
+//   imports: [MatCard, MatCardContent, MatCardTitle, MatToolbar, CommonModule, UserHeaderComponent, FooterComponent],
 //   templateUrl: './results.html',
 //   styleUrls: ['./results.css']
 // })
 // export class ResultsComponent implements OnInit {
+//   examId!: number;
+//   userId!: number;
+//   results: ResponseSummary[] = [];
+//   totalMarks = 0;
+//   isLoading = true;
 
-//   resultData = {
-//     userName: 'Sai Sreekar',
-//     examName: 'Java Basics',
-//     score: 26,
-//     totalMarks: 30,
-//     status: 'Pass'
-//   };
+//   constructor(private resultService: ResultService, private route: ActivatedRoute) {}
 
-//   questions = [
-//     {
-//       id: 1,
-//       text: 'What is the capital of India?',
-//       userAnswer: 'Mumbai',
-//       correctAnswer: 'Delhi'
-//     },
-//     {
-//       id: 2,
-//       text: 'Which is not a Java feature?',
-//       userAnswer: 'Pointer-based',
-//       correctAnswer: 'Pointer-based'
-//     },
-//     {
-//       id: 3,
-//       text: 'Which layer in OSI deals with end-to-end delivery?',
-//       userAnswer: 'Network',
-//       correctAnswer: 'Transport'
+//   ngOnInit(): void {
+//     this.examId = Number(localStorage.getItem('examId'));
+//     this.userId = Number(localStorage.getItem('userId'));
+
+//     if (!this.examId || !this.userId) {
+//       alert('Missing exam or user information');
+//       return;
 //     }
-//   ];
 
-//   displayedColumns: string[] = ['text', 'userAnswer', 'correctAnswer', 'status'];
-
-//   constructor(private router: Router) {}
-
-//   ngOnInit(): void {}
-
-//   getStatus(question: any): string {
-//     return question.userAnswer === question.correctAnswer ? 'Correct' : 'Wrong';
-//   }
-
-//   goHome() {
-//     this.router.navigate(['/student-home']);
+//     this.resultService.getResult(this.examId, this.userId).subscribe({
+//       next: (res) => {
+//         this.results = res;
+//         this.totalMarks = res.reduce((sum, r) => sum + r.marksObtained, 0);
+//         this.isLoading = false;
+//       },
+//       error: (err) => {
+//         alert('Failed to load results: ' + err.message);
+//         this.isLoading = false;
+//       }
+//     });
 //   }
 // }
+
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { ExamService, Exam, ResponseSummaryDTO } from '../services/exam-service';
+import { QuestionService,Question } from '../services/question/question-service';
+import { ResultService } from '../services/result-service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-results',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatCardModule, MatToolbarModule, MatButtonModule, MatMenuModule, MatIconModule, MatTableModule],
+  imports: [MatCard, MatCardContent, MatCardTitle, MatToolbar, CommonModule, UserHeaderComponent, FooterComponent],
   templateUrl: './results.html',
   styleUrls: ['./results.css']
 })
 export class ResultsComponent implements OnInit {
-  resultData: any;
-  displayedColumns: string[] = ['text', 'userAnswer', 'correctAnswer', 'status'];
-  questions: any[] = [];
+  examId!: number;
+  userId!: number;
+  isLoading = true;
+  examDetails!: Exam;
+  totalMarks = 0;
+
+  // final structure: [{ question: Question, response: ResponseSummaryDTO }]
+  detailedResults: {
+    question: Question;
+    response: ResponseSummaryDTO;
+  }[] = [];
 
   constructor(
-    private resultService: ResultService,
-    private router: Router
+    private route: ActivatedRoute,
+    private examService: ExamService,
+    private questionService: QuestionService,
+    private resultService:ResultService
   ) {}
 
   ngOnInit(): void {
-    const navigation = this.router.getCurrentNavigation();
-    const userId = navigation?.extras?.state?.['userId'];
+    this.examId = Number(localStorage.getItem('examId'));
+    this.userId = Number(localStorage.getItem('userId'));
 
-    if (userId) {
-      const examId = 1; // In real case, examId should be passed via state or route param
-      this.resultService.getUserReport(userId, examId).subscribe({
-        next: (res) => {
-          this.resultData = {
-            userName: `User-${userId}`,
-            examName: `Exam-${examId}`,
-            score: res.totalMarks,
-            totalMarks: 100,
-            status: res.performanceMetrics
-          };
-        },
-        error: () => alert('Failed to load report')
-      });
-    } else {
-      alert('No user ID found');
-      this.router.navigate(['/student-home']);
+    if (!this.examId || !this.userId) {
+      alert('Missing exam or user ID');
+      return;
     }
+
+    this.loadResults();
   }
 
-  getStatus(q: any): string {
-    return q.userAnswer === q.correctAnswer ? 'Correct' : 'Wrong';
-  }
+  // loadResults() {
+  //   this.resultService.getResult(this.examId, this.userId).subscribe({
+  //     next: (responses) => {
+  //       const fetches = responses.map(response =>
+  //         this.questionService.getQuestionById(response.questionId).toPromise().then(question => ({
+  //           question,
+  //           response
+  //         }))
+  //       );
 
-  goHome() {
-    this.router.navigate(['/student-home']);
+  //       Promise.all(fetches).then(results => {
+  //         this.detailedResults = results;
+  //         this.totalMarks = results.reduce((sum, r) => sum + (r.response.marksObtained || 0), 0);
+  //         this.loadExamDetails(); // load exam info like title, duration
+  //       });
+  //     },
+  //     error: err => {
+  //       alert('Failed to load results: ' + err.message);
+  //       this.isLoading = false;
+  //     }
+  //   });
+  // }
+
+  loadResults() {
+  this.resultService.getResult(this.examId, this.userId).subscribe({
+    next: (responses) => {
+      const fetches = responses.map(response =>
+        this.questionService.getQuestionById(response.questionId).toPromise().then(question => {
+          if (!question) {
+            console.warn(`Question not found for ID ${response.questionId}`);
+            return null;
+          }
+          return { question, response };
+        })
+      );
+
+      Promise.all(fetches).then(results => {
+        // Filter out any nulls (where question was not found)
+        this.detailedResults = results.filter(
+          (item): item is { question: Question; response: ResponseSummaryDTO } => item !== null
+        );
+
+        this.totalMarks = this.detailedResults.reduce(
+          (sum, r) => sum + (r.response.marksObtained || 0),
+          0
+        );
+
+        this.loadExamDetails(); // Load title/description
+        this.isLoading = false;
+      });
+    },
+    error: err => {
+      alert('Failed to load results: ' + err.message);
+      this.isLoading = false;
+    }
+  });
+}
+
+
+  loadExamDetails() {
+    this.examService.getExamById(this.examId).subscribe({
+      next: exam => {
+        this.examDetails = exam;
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+        alert('Failed to load exam details');
+      }
+    });
   }
 }

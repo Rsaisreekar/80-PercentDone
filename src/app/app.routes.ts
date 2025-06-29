@@ -10,6 +10,7 @@ import { ResultsComponent } from './result/results';
 import { ManageExamsComponent } from './dashboard/admin-home/manage-exams';
 import { ManageQuestionsComponent } from './admin/manage-questions';
 import { ManageUsersComponent } from './admin/manage-users';
+import { QuestionBankComponent } from './questionBank/question-bank/question-bank';
 import { AuthGuard } from './guards/auth-guard';
 
 export const appRoutes: Routes = [
@@ -43,6 +44,10 @@ export const appRoutes: Routes = [
   {
   path: 'admin/questions/:examId',
   component: ManageQuestionsComponent
+},
+{
+  path: 'question-bank',
+  component: QuestionBankComponent
 },
 
 

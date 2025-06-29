@@ -16,8 +16,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class RoleService {
-  private baseUrl = 'http://localhost:8082/api';
-  private baseUrl2 = 'http://localhost:8081/examProtal/userModule';
+  private baseUrl = 'http://localhost:8090/api';
+  private baseUrl2 = 'http://localhost:8090/examPortal/userModule';
 
   constructor(private http: HttpClient) {}
 

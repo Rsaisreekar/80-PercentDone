@@ -1,136 +1,4 @@
-// import { Component, OnInit } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { FormsModule } from '@angular/forms';
-// import { ActivatedRoute } from '@angular/router';
-// import { MatDialog } from '@angular/material/dialog';
-// import { MatToolbar } from '@angular/material/toolbar';
-// import { MatCard } from '@angular/material/card';
-// import { MatCardTitle } from '@angular/material/card';
-// import { MatCardContent } from '@angular/material/card';
-// import { MatCardActions } from '@angular/material/card';
-// import { QuestionService } from '../services/question/question-service';
-// import { Question } from '../models/question.model';
-// import { AddEditQuestionDialogComponent } from './add-edit-question-dialog';
-// import { ImportQuestionDialogComponent } from './import-question-dialog';
 
-// @Component({
-//   selector: 'app-manage-questions',
-//   standalone: true,
-//   imports: [MatToolbar,MatCard,MatCardContent,MatCardTitle,MatCardActions,CommonModule],
-//   templateUrl: './manage-questions.html',
-//   styleUrls: ['./manage-questions.css']
-// })
-// export class ManageQuestionsComponent implements OnInit {
-//   examId!: number;
-//   questionBank: Question[] = [];
-//   mappedQuestionIds: number[] = [];
-
-//   constructor(
-//     private route: ActivatedRoute,
-//     private questionService: QuestionService,
-//     private dialog: MatDialog
-//   ) {}
-
-//   ngOnInit(): void {
-//     this.examId = Number(this.route.snapshot.paramMap.get('examId'));
-//     if (!this.examId) {
-//       alert('Invalid exam ID');
-//       return;
-//     }
-
-//     this.loadAllQuestions();
-//     this.loadMappedQuestions();
-//   }
-
-//   get questions(): Question[] {
-//     return this.questionBank.filter(q => this.mappedQuestionIds.includes(q.questionId));
-//   }
-
-//   loadAllQuestions() {
-//     this.questionService.getAllQuestions().subscribe({
-//       next: data => this.questionBank = data,
-//       error: err => alert('Failed to load questions: ' + err.error.message)
-//     });
-//   }
-
-//   loadMappedQuestions() {
-//     this.questionService.getMappedQuestions(this.examId).subscribe({
-//       next: data => this.mappedQuestionIds = data.map(q => q.questionId),
-//       error: err => alert('Failed to load mapped questions: ' + err.error.message)
-//     });
-//   }
-
-//   importQuestions() {
-//     const dialogRef = this.dialog.open(ImportQuestionDialogComponent, {
-//       width: '500px',
-//       data: { examId: this.examId, questionBank: this.questionBank }
-//     });
-
-//     dialogRef.afterClosed().subscribe((selectedIds: number[]) => {
-//       if (selectedIds?.length) {
-//         this.questionService.mapQuestions(this.examId, selectedIds).subscribe({
-//           next: () => this.loadMappedQuestions(),
-//           error: err => alert('Mapping failed: ' + err.error.message)
-//         });
-//       }
-//     });
-//   }
-
-//   addQuestion() {
-//     const dialogRef = this.dialog.open(AddEditQuestionDialogComponent, {
-//       width: '600px',
-//       data: {}
-//     });
-
-//     dialogRef.afterClosed().subscribe((newQuestion: Question) => {
-//       if (newQuestion) {
-//         this.questionService.addQuestion(newQuestion).subscribe({
-//           next: () => {
-//             this.loadAllQuestions();
-//             setTimeout(() => this.mapSingleQuestion(newQuestion.questionId), 500);
-//           },
-//           error: err => alert('Failed to add question: ' + err.error.message)
-//         });
-//       }
-//     });
-//   }
-
-//   editQuestion(id: number) {
-//     const question = this.questionBank.find(q => q.questionId === id);
-//     const dialogRef = this.dialog.open(AddEditQuestionDialogComponent, {
-//       width: '600px',
-//       data: { question }
-//     });
-
-//     dialogRef.afterClosed().subscribe((updated: Question) => {
-//       if (updated) {
-//         this.questionService.updateQuestion(updated.questionId!, updated).subscribe({
-//           next: () => this.loadAllQuestions(),
-//           error: err => alert('Failed to update question: ' + err.error.message)
-//         });
-//       }
-//     });
-//   }
-
-//   deleteQuestion(id: number) {
-//     if (confirm('Are you sure you want to delete this question?')) {
-//       this.questionService.deleteQuestion(id).subscribe({
-//         next: () => {
-//           this.loadAllQuestions();
-//           this.mappedQuestionIds = this.mappedQuestionIds.filter(qid => qid !== id);
-//         },
-//         error: err => alert('Failed to delete question: ' + err.error.message)
-//       });
-//     }
-//   }
-
-//   private mapSingleQuestion(questionId: number) {
-//     this.questionService.mapQuestionToExam(this.examId, questionId).subscribe({
-//       next: () => this.loadMappedQuestions(),
-//       error: err => console.error('Failed to map question:', err)
-//     });
-//   }
-// }
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -138,8 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatCard, MatCardContent, MatCardTitle, MatCardActions } from '@angular/material/card';
-import { QuestionService } from '../services/question/question-service';
-import { Question } from '../models/question.model';
+import { Mapping,QuestionService, Question } from '../services/question/question-service';
 import { ImportQuestionDialogComponent } from '../admin/import-question-dialog';
 import { AddEditQuestionDialogComponent } from '../admin/add-edit-question-dialog';
 import { RouterModule } from '@angular/router';
@@ -147,7 +14,15 @@ import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-manage-questions',
   standalone: true,
-  imports: [MatToolbar, MatCard, MatCardContent, MatCardTitle, MatCardActions, CommonModule, RouterModule],
+  imports: [
+    MatToolbar,
+    MatCard,
+    MatCardContent,
+    MatCardTitle,
+    MatCardActions,
+    CommonModule,
+    RouterModule
+  ],
   templateUrl: './manage-questions.html',
   styleUrls: ['./manage-questions.css']
 })
@@ -155,6 +30,7 @@ export class ManageQuestionsComponent implements OnInit {
   examId!: number;
   questionBank: Question[] = [];
   mappedQuestionIds: number[] = [];
+  mappings: Mapping[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -174,70 +50,90 @@ export class ManageQuestionsComponent implements OnInit {
   }
 
   get questions(): Question[] {
-    return this.questionBank
-      .filter(q => this.mappedQuestionIds.includes(q.questionId))
-      .map(q => ({
-        ...q,
-        options: Array.isArray(q.options) ? q.options : []
-      }));
+    return this.questionBank;
   }
 
-  loadAllQuestions() {
+  loadAllQuestions(): void {
     this.questionService.getAllQuestions().subscribe({
       next: data => {
         this.questionBank = data.map(q => ({
-          ...q,
-          options: Array.isArray(q.options) ? q.options : []
-        }));
-      },
-      error: err => alert('Failed to load questions: ' + err.error.message)
+  ...q,
+  options: [q.option1, q.option2].filter(opt => !!opt)  // Ensure non-empty
+}));
+}
     });
   }
 
-  loadMappedQuestions() {
-    this.questionService.getMappedQuestions(this.examId).subscribe({
-      next: data => this.mappedQuestionIds = data.map(q => q.questionId),
-      error: err => alert('Failed to load mapped questions: ' + err.error.message)
-    });
-  }
+  loadMappedQuestions(): void {
+    this.questionService.getMappingsForExam(this.examId).subscribe({
+      next: mappings => {
+        this.mappings = mappings;
+        this.mappedQuestionIds = mappings.map(m => m.questionId);
 
-  importQuestions() {
-    const dialogRef = this.dialog.open(ImportQuestionDialogComponent, {
-      width: '500px',
-      data: { examId: this.examId, questionBank: this.questionBank }
-    });
-
-    dialogRef.afterClosed().subscribe((selectedIds: number[]) => {
-      if (selectedIds?.length) {
-        this.questionService.mapQuestions(this.examId, selectedIds).subscribe({
-          next: () => this.loadMappedQuestions(),
-          error: err => alert('Mapping failed: ' + err.error.message)
-        });
+        // Filter the questions from the bank that are mapped to this exam
+        this.questionBank = this.questionBank.filter(q => this.mappedQuestionIds.includes(q.questionId));
       }
+      
     });
   }
 
-  addQuestion() {
+  importQuestions(): void {
+    this.questionService.getAllQuestions().subscribe({
+      next: allQuestions => {
+        const dialogRef = this.dialog.open(ImportQuestionDialogComponent, {
+          width: '600px',
+          data: {
+            questionBank: allQuestions,
+            mappedQuestionIds: this.mappedQuestionIds,
+            examId: this.examId
+          }
+        });
+
+        dialogRef.afterClosed().subscribe((selectedIds: number[]) => {
+          if (selectedIds?.length) {
+            this.questionService.mapQuestions(this.examId, selectedIds).subscribe({
+              next: () => this.loadMappedQuestions()
+              
+            });
+          }
+        });
+      },
+     
+    });
+  }
+
+  mapSingleQuestion(questionId: number): void {
+    this.questionService.mapQuestionToExam(this.examId, questionId).subscribe({
+      next: () => {
+       // alert('Question mapped successfully!');
+        this.loadMappedQuestions();
+      },
+
+    });
+  }
+
+  addQuestion(): void {
     const dialogRef = this.dialog.open(AddEditQuestionDialogComponent, {
       width: '600px',
       data: {}
     });
 
-    dialogRef.afterClosed().subscribe((newQuestion: Question) => {
+    dialogRef.afterClosed().subscribe((newQuestion: Question[]) => {
       if (newQuestion) {
         this.questionService.addQuestion(newQuestion).subscribe({
-          next: () => {
-            this.loadAllQuestions();
-            setTimeout(() => this.mapSingleQuestion(newQuestion.questionId), 500);
-          },
-          error: err => alert('Failed to add question: ' + err.error.message)
+          next: added => {
+            const addedQuestion = added[0];
+            this.mapSingleQuestion(addedQuestion.questionId);
+          }
         });
       }
     });
   }
 
-  editQuestion(id: number) {
+  editQuestion(id: number): void {
     const question = this.questionBank.find(q => q.questionId === id);
+    if (!question) return;
+
     const dialogRef = this.dialog.open(AddEditQuestionDialogComponent, {
       width: '600px',
       data: { question }
@@ -245,30 +141,36 @@ export class ManageQuestionsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((updated: Question) => {
       if (updated) {
-        this.questionService.updateQuestion(updated.questionId!, updated).subscribe({
-          next: () => this.loadAllQuestions(),
-          error: err => alert('Failed to update question: ' + err.error.message)
+        this.questionService.updateQuestion(updated.questionId, updated).subscribe({
+          next: () => this.loadMappedQuestions(),
+          error: err => alert('Failed to update question: ' + err.error?.message || err.message)
         });
       }
     });
   }
 
-  deleteQuestion(id: number) {
-    if (confirm('Are you sure you want to delete this question?')) {
-      this.questionService.deleteQuestion(id).subscribe({
-        next: () => {
-          this.loadAllQuestions();
-          this.mappedQuestionIds = this.mappedQuestionIds.filter(qid => qid !== id);
-        },
-        error: err => alert('Failed to delete question: ' + err.error.message)
-      });
-    }
+  deleteQuestion(questionId: number): void {
+  const mapping = this.mappings.find(m => m.questionId === questionId);
+
+  console.log('Mappings:', this.mappings);
+console.log('Question ID to unmap:', questionId);
+
+
+  if (!mapping || !mapping.mappingId) {
+    alert('Mapping not found or invalid mapping ID for this question.');
+    console.error('Mapping object:', mapping);
+    return;
   }
 
-  private mapSingleQuestion(questionId: number) {
-    this.questionService.mapQuestionToExam(this.examId, questionId).subscribe({
-      next: () => this.loadMappedQuestions(),
-      error: err => console.error('Failed to map question:', err)
+  if (confirm('Are you sure you want to unmap this question from the exam?')) {
+    this.questionService.deleteMapping(mapping.mappingId).subscribe({
+      next: () => {
+        alert('Question unmapped successfully.');
+        this.loadMappedQuestions();
+      },
+      error: err => alert('Failed to unmap question: ' + err.message)
     });
   }
+}
+
 }

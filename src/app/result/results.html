@@ -1,77 +1,45 @@
-<mat-toolbar color="primary" class="toolbar">
-  <span class="title">Online Exam Portal</span>
-  <span class="spacer"></span>
-  <a mat-button routerLink="/student-home">Home</a>
-  <a mat-button routerLink="/exams">Exams</a>
-  <a mat-button routerLink="/results">Results</a>
+<!-- <app-user-header></app-user-header>
 
-  <button mat-icon-button [matMenuTriggerFor]="profileMenu">
-    <img src="https://i.pravatar.cc/30" alt="User" class="avatar" />
-  </button>
-</mat-toolbar>
+<mat-toolbar color="accent">Exam Result</mat-toolbar>
 
-<mat-menu #profileMenu="matMenu">
-  <button mat-menu-item disabled>Name: {{ resultData.userName }}</button>
-  <button mat-menu-item disabled>Email: saiexample.com</button>
-  <button mat-menu-item (click)="goHome()">Go to Home</button>
-</mat-menu>
+<div *ngIf="isLoading">Loading results...</div>
 
-<div class="result-container">
-  <h2>Hi, {{ resultData.userName }}! Here are your results.</h2>
-
-  <mat-card>
-    <mat-card-title>{{ resultData.examName }}</mat-card-title>
+<div *ngIf="!isLoading">
+  <h3>Results for Exam ID: {{ examId }}</h3>
+  <mat-card *ngFor="let r of results">
+    <mat-card-title>Question ID: {{ r.questionId }}</mat-card-title>
     <mat-card-content>
-      <p><strong>Score:</strong> {{ resultData.score }} / {{ resultData.totalMarks }}</p>
-      <p><strong>Status:</strong> 
-        <span [style.color]="resultData.status === 'Pass' ? 'green' : 'red'">
-          {{ resultData.status }}
-        </span>
-      </p>
+      <p><strong>Your Answer:</strong> {{ r.submittedAnswer }}</p>
+      <p><strong>Marks Obtained:</strong> {{ r.marksObtained }}</p>
     </mat-card-content>
   </mat-card>
 
-  <div style="margin-top: 20px;">
-    <button mat-raised-button color="primary" (click)="goHome()">Back to Home</button>
-  </div>
+  <h2>Total Marks: {{ totalMarks }}</h2>
 </div>
-<h3 style="margin-top: 40px;">Question-wise Breakdown</h3>
+<app-footer> -->
 
-<table mat-table [dataSource]="questions" class="mat-elevation-z8 full-width-table">
+<app-user-header></app-user-header>
 
-  <!-- Question Column -->
-  <ng-container matColumnDef="text">
-    <th mat-header-cell *matHeaderCellDef> Question </th>
-    <td mat-cell *matCellDef="let element"> {{element.text}} </td>
-  </ng-container>
+<mat-toolbar color="accent">Exam Result</mat-toolbar>
 
-  <!-- User Answer Column -->
-  <ng-container matColumnDef="userAnswer">
-    <th mat-header-cell *matHeaderCellDef> Your Answer </th>
-    <td mat-cell *matCellDef="let element"> {{element.userAnswer}} </td>
-  </ng-container>
+<div *ngIf="isLoading">Loading results...</div>
 
-  <!-- Correct Answer Column -->
-  <ng-container matColumnDef="correctAnswer">
-    <th mat-header-cell *matHeaderCellDef> Correct Answer </th>
-    <td mat-cell *matCellDef="let element"> {{element.correctAnswer}} </td>
-  </ng-container>
+<div *ngIf="!isLoading">
+  <h3>Results for Exam: {{ examDetails?.title }}</h3>
+  <p>{{ examDetails?.description }}</p>
+  <p><strong>Duration:</strong> {{ examDetails?.duration }} minutes</p>
+  <p><strong>Total Marks:</strong> {{ examDetails?.totalMarks }}</p>
 
-  <!-- Status Column -->
-  <ng-container matColumnDef="status">
-    <th mat-header-cell *matHeaderCellDef> Status </th>
-    <td mat-cell *matCellDef="let element">
-      <span [ngStyle]="{ color: getStatus(element) === 'Correct' ? 'green' : 'red' }">
-        {{ getStatus(element) }}
-      </span>
-    </td>
-  </ng-container>
+  <mat-card *ngFor="let item of detailedResults">
+    <mat-card-title>{{ item.question.text }}</mat-card-title>
+    <mat-card-content>
+      <p><strong>Your Answer:</strong> {{ item.response.submittedAnswer }}</p>
+      <p><strong>Correct Answer:</strong> {{ item.question.correctAnswer }}</p>
+      <p><strong>Marks Obtained:</strong> {{ item.response.marksObtained }}</p>
+    </mat-card-content>
+  </mat-card>
 
-  <tr mat-header-row *matHeaderRowDef="['text', 'userAnswer', 'correctAnswer', 'status']"></tr>
-  <tr mat-row *matRowDef="let row; columns: ['text', 'userAnswer', 'correctAnswer', 'status'];"></tr>
-</table>
+  <h2>Total Marks: {{ totalMarks }}</h2>
+</div>
 
-
-<mat-toolbar color="primary" class="footer">
-  <span>&#64; 2025 Online Exam Portal | All rights reserved.</span>
-</mat-toolbar>
+<app-footer></app-footer>

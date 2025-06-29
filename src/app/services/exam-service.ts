@@ -20,7 +20,12 @@ export interface Exam {
   totalMarks: number;
 }
 
-
+export interface ResponseSummaryDTO {
+  responseId: number;
+  questionId: number;
+  submittedAnswer: string;
+  marksObtained: number;
+}
 export interface AnswerSubmissionDTO {
   questionId: number;
   submittedAnswer: string;
@@ -35,8 +40,8 @@ export interface ExamSubmissionDTO {
   providedIn: 'root'
 })
 export class ExamService {
-  private baseUrl = 'http://localhost:8082/api/admin/exams'; // update port if needed
-  private baseUrl2 = 'http://localhost:8084/api/exam-management';
+  private baseUrl = 'http://localhost:8090/api/admin/exams'; // update port if needed
+  private baseUrl2 = 'http://localhost:8090/api/exam-management';
 
 
   constructor(private http: HttpClient) {}
@@ -49,9 +54,10 @@ export class ExamService {
     return this.http.get<any[]>(`${this.baseUrl2}/${examId}/attempt`);
   }
   
-  submitExam(examId: number, submission: ExamSubmissionDTO): Observable<any> {
-    return this.http.post(`${this.baseUrl}/submit/${examId}`, submission);
-  }
+  submitExam(examId: number, submission: ExamSubmissionDTO): Observable<ResponseSummaryDTO[]> {
+  return this.http.post<ResponseSummaryDTO[]>(`${this.baseUrl2}/${examId}/submit`, submission);
+}
+
 
   getExamById(id: number): Observable<Exam> {
     return this.http.get<Exam>(`${this.baseUrl}/${id}`);
