@@ -38,30 +38,41 @@ export class LoginComponent {
     });
   }
 
-  // onSubmit() {
-  //   if (this.loginForm.valid) {
-  //     this.auth.login(this.loginForm.value).subscribe({
-  //       next: (res) => {
-  //         this.auth.storeToken(res.token);
-  //         const role = this.auth.decodeRoleFromToken();
-  //         if (role === 'ADMIN') this.router.navigate(['/admin-home']);
-  //         else if (role === 'STUDENT') this.router.navigate(['/student-home']);
-  //       },
-  //       error: () => alert('Invalid Credentials')
-  //     });
-  //   }
-  // }
-  onSubmit() {
+//   onSubmit() {
+//   if (this.loginForm.invalid) return;
+
+//   this.auth.login(this.loginForm.value).subscribe({
+//     next: res => {
+//       if (res.role === 'ADMIN') {
+//         this.router.navigate(['/admin-home']);
+//       } else if(res.role === "EXAMINER") {
+//         this.router.navigate(['/examiner-home']);
+//       }else{
+//         this.router.navigate(['/student-home']);
+//       }
+//     }
+//   });
+// }
+
+onSubmit() {
   if (this.loginForm.invalid) return;
 
   this.auth.login(this.loginForm.value).subscribe({
     next: res => {
-      if (res.role === 'ADMIN') {
+      this.auth.login(res.token);
+      const role = this.auth.decodeRoleFromToken();
+
+      if (role === 'ADMIN') {
         this.router.navigate(['/admin-home']);
-      } else {
+      } else if (role === 'STUDENT') {
         this.router.navigate(['/student-home']);
+      } else if (role === 'EXAMINER') {
+        this.router.navigate(['/examiner-home']);
+      } else {
+        alert('Unknown role. Please contact support.');
       }
-    }
+    },
+    error: () => alert('Invalid Credentials')
   });
 }
 

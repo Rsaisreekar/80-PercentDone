@@ -12,6 +12,10 @@ import { ManageQuestionsComponent } from './admin/manage-questions';
 import { ManageUsersComponent } from './admin/manage-users';
 import { QuestionBankComponent } from './questionBank/question-bank/question-bank';
 import { AuthGuard } from './guards/auth-guard';
+import { ExaminerHome } from './dashboard/examiner-home/examiner-home/examiner-home';
+import { ViewStudentsComponent } from './dashboard/examiner-home/viewStudent/view-student/view-student';
+import { ViewExamsComponent } from './dashboard/viewExams/view-exams/view-exams';
+import { ViewReport } from './dashboard/examiner-home/viewReports/view-report/view-report';
 
 export const appRoutes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -49,11 +53,16 @@ export const appRoutes: Routes = [
   path: 'question-bank',
   component: QuestionBankComponent
 },
-
-
-  //{ path: 'exam/:examId', component: AttemptExamComponent },     // To be created
-  { path: 'results', component: ResultsComponent },               // To be created
-  //{ path: 'update-profile', component: UpdateProfileComponent }, // To be created
+{ path: 'results', component: ResultsComponent },   
+{
+    path: 'examiner-home',
+    component: ExaminerHome,
+    canActivate: [AuthGuard],
+    data: { role: 'EXAMINER' } 
+},
+{ path: 'examiner/students', component: ViewStudentsComponent },
+{ path: 'examiner/exams', component: ViewExamsComponent },
+{ path: 'examiner/reports', component: ViewReport }           
 
 ];
 
